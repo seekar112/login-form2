@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wallet Address Viewer</title>
+    <title>Trust Wallet Ethereum Wallet</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
     <style>
       :root {
         --bg: #07111f;
@@ -105,28 +106,55 @@
         font-size: 1.05rem;
       }
 
-      .balance-row {
+      .stats {
         display: grid;
-        grid-template-columns: repeat(3, minmax(140px, 1fr));
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
         gap: 12px;
         margin-bottom: 18px;
       }
 
-      .balance-box {
+      .stat-box {
         background: rgba(2, 6, 23, 0.56);
         border: 1px solid var(--border);
         border-radius: 14px;
         padding: 14px;
       }
 
-      .balance-box small {
+      .stat-box small {
         display: block;
         color: var(--muted);
         margin-bottom: 6px;
       }
 
-      .balance-box strong {
-        font-size: 1.25rem;
+      .stat-box strong {
+        display: block;
+        font-size: 1.2rem;
+        word-break: break-all;
+      }
+
+      .wallet-card {
+        background: rgba(2, 6, 23, 0.56);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        margin-bottom: 18px;
+      }
+
+      .wallet-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .address-box {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        word-break: break-all;
+        font-family: "SFMono-Regular", Consolas, monospace;
       }
 
       form {
@@ -136,7 +164,7 @@
 
       .field-row {
         display: grid;
-        grid-template-columns: 170px 1fr auto;
+        grid-template-columns: 1fr 1fr auto;
         gap: 12px;
       }
 
@@ -210,121 +238,11 @@
         gap: 12px;
       }
 
-      .result {
-        margin-top: 18px;
-        display: grid;
-        gap: 16px;
-      }
-
-      .result-card {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 18px;
-      }
-
-      .result-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-
-      .badge {
-        font-size: 0.74rem;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        border-radius: 999px;
-        padding: 6px 10px;
-        border: 1px solid var(--border);
-      }
-
-      .badge.valid {
-        background: rgba(34, 197, 94, 0.12);
-        color: #bbf7d0;
-        border-color: rgba(34, 197, 94, 0.28);
-      }
-
-      .badge.invalid {
-        background: rgba(239, 68, 68, 0.12);
-        color: #fecaca;
-        border-color: rgba(239, 68, 68, 0.28);
-      }
-
-      .address-box {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        background: rgba(2, 6, 23, 0.66);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 14px 16px;
-        word-break: break-all;
-      }
-
-      .address-box span {
-        color: var(--text);
-        font-family: "SFMono-Regular", Consolas, monospace;
-      }
-
-      .mini-copy {
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: rgba(59, 130, 246, 0.1);
-        color: #dbeafe;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        cursor: pointer;
-      }
-
-      .meta {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(120px, 1fr));
-        gap: 12px;
-        margin-top: 16px;
-      }
-
-      .meta-item {
-        background: rgba(2, 6, 23, 0.56);
-        border-radius: 12px;
-        padding: 12px 14px;
-        border: 1px solid var(--border);
-      }
-
-      .meta-item small {
-        display: block;
-        color: var(--muted);
-        margin-bottom: 6px;
-      }
-
-      .meta-item strong {
-        font-size: 1rem;
-      }
-
-      .transfer-box {
-        background: rgba(2, 6, 23, 0.56);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 18px;
-        margin-top: 18px;
-      }
-
-      .transfer-box h3 {
-        margin: 0 0 14px;
-      }
-
-      .transfer-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
       .message {
         display: none;
         padding: 12px 14px;
         border-radius: 12px;
-        margin-top: 14px;
+        margin-top: 6px;
       }
 
       .message.success {
@@ -339,6 +257,19 @@
         background: rgba(239, 68, 68, 0.12);
         border: 1px solid rgba(239, 68, 68, 0.3);
         color: #fecaca;
+      }
+
+      .message.info {
+        display: block;
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #dbeafe;
+      }
+
+      .helper {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 4px;
       }
 
       .qr-panel {
@@ -364,29 +295,24 @@
         object-fit: cover;
       }
 
-      .network-list {
+      .info-list {
         list-style: none;
         margin: 0;
         padding: 0;
         display: grid;
         gap: 12px;
+        width: 100%;
       }
 
-      .network-item {
+      .info-item {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 12px;
+        align-items: center;
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 12px 14px;
         background: rgba(15, 23, 42, 0.72);
-      }
-
-      .network-item strong {
-        display: flex;
-        align-items: center;
-        gap: 10px;
       }
 
       .dot {
@@ -400,46 +326,13 @@
       .blue { background: var(--accent-2); }
       .orange { background: var(--warning); }
 
-      .empty {
-        color: var(--muted);
-        font-size: 0.95rem;
-      }
-
-      .recent-list {
-        list-style: none;
-        margin: 12px 0 0;
-        padding: 0;
-        display: grid;
-        gap: 10px;
-      }
-
-      .recent-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        background: rgba(2, 6, 23, 0.52);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 12px;
-      }
-
-      .recent-item button {
-        background: transparent;
-        border: none;
-        color: #bfdbfe;
-        cursor: pointer;
-      }
-
       @media (max-width: 860px) {
         .content {
           grid-template-columns: 1fr;
         }
 
-        .balance-row,
-        .field-row,
-        .transfer-grid,
-        .meta {
+        .stats,
+        .field-row {
           grid-template-columns: 1fr;
         }
 
@@ -454,344 +347,201 @@
     <div class="app">
       <div class="header">
         <div class="brand">
-          <div class="brand-mark">W</div>
-          <h1>Wallet Address Viewer</h1>
+          <div class="brand-mark">T</div>
+          <h1>Trust Wallet Ethereum</h1>
         </div>
-        <div class="status-pill">Address-only mode</div>
+        <div class="status-pill">Live wallet app</div>
       </div>
 
       <div class="content">
         <main class="panel">
-          <div class="balance-row">
-            <div class="balance-box">
-              <small>Available balance</small>
-              <strong id="display-balance">0.00 ETH</strong>
+          <div class="stats">
+            <div class="stat-box">
+              <small>Balance</small>
+              <strong id="balance-value">0.00 ETH</strong>
             </div>
-            <div class="balance-box">
+            <div class="stat-box">
               <small>Network</small>
-              <strong>Ethereum</strong>
+              <strong id="network-value">Not connected</strong>
             </div>
-            <div class="balance-box">
-              <small>Last updated</small>
-              <strong id="last-updated">Now</strong>
+            <div class="stat-box">
+              <small>Account</small>
+              <strong id="account-short">Not linked</strong>
             </div>
           </div>
 
-          <h2>Check or inspect a wallet address</h2>
+          <div class="wallet-card">
+            <div class="wallet-row">
+              <h2>Connected wallet</h2>
+              <button class="secondary" id="connect-wallet" type="button">Connect Trust Wallet</button>
+            </div>
+            <div class="address-box" id="wallet-address">Not connected</div>
+            <div class="helper">Open this page inside Trust Wallet, or install the Trust Wallet browser extension.</div>
+          </div>
 
-          <form id="wallet-form">
+          <h2>Send ETH</h2>
+          <form id="transfer-form">
             <div class="field-row">
-              <select id="network-select" aria-label="Select wallet network">
-                <option value="auto">Auto detect</option>
-                <option value="ethereum">Ethereum</option>
-                <option value="solana">Solana</option>
-                <option value="bitcoin">Bitcoin</option>
-              </select>
-
-              <input
-                id="wallet-input"
-                type="text"
-                placeholder="Enter a wallet address only"
-                aria-label="Wallet address"
-              />
-
-              <button class="primary" type="submit">Validate</button>
+              <input id="recipient-address" type="text" placeholder="Recipient ETH address" />
+              <input id="transfer-amount" type="number" min="0.000001" step="0.000001" placeholder="Amount in ETH" />
+              <button class="primary" type="submit">Send</button>
             </div>
-
-            <div class="actions">
-              <button class="secondary" type="button" id="copy-address">Copy</button>
-              <button class="ghost" type="button" id="clear-form">Clear</button>
-              <button class="ghost" type="button" id="load-sample">Load sample</button>
-            </div>
+            <textarea id="transfer-note" placeholder="Optional memo"></textarea>
+            <div id="transfer-message" class="message"></div>
           </form>
-
-          <div class="result" id="result-box" hidden>
-            <div class="result-card">
-              <div class="result-header">
-                <strong>Wallet status</strong>
-                <span class="badge invalid" id="status-badge">Invalid</span>
-              </div>
-
-              <div class="address-box">
-                <span id="display-address">-</span>
-                <button class="mini-copy" type="button" id="mini-copy">Copy</button>
-              </div>
-
-              <div class="meta">
-                <div class="meta-item">
-                  <small>Network</small>
-                  <strong id="meta-network">-</strong>
-                </div>
-                <div class="meta-item">
-                  <small>Type</small>
-                  <strong id="meta-type">-</strong>
-                </div>
-                <div class="meta-item">
-                  <small>Length</small>
-                  <strong id="meta-length">-</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="transfer-box">
-            <h3>Quick transfer</h3>
-            <form id="transfer-form">
-              <div class="transfer-grid">
-                <input id="recipient-address" type="text" placeholder="Recipient wallet address" />
-                <input id="transfer-amount" type="number" min="0.01" step="0.01" placeholder="Amount" />
-              </div>
-              <textarea id="transfer-note" placeholder="Memo (optional)"></textarea>
-              <div class="actions">
-                <button class="primary" type="submit">Send demo transfer</button>
-              </div>
-              <div id="transfer-message" class="message"></div>
-            </form>
-          </div>
         </main>
 
         <aside class="panel qr-panel">
           <div class="qr-box">
-            <img id="qr-image" alt="QR code for wallet address" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' fill='%2307111f'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23e2e8f0' font-size='18' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E" />
+            <img id="qr-image" alt="Wallet QR code" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' fill='%2307111f'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23e2e8f0' font-size='18' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E" />
           </div>
 
           <div style="width:100%">
-            <h2>Supported networks</h2>
-            <ul class="network-list">
-              <li class="network-item">
-                <strong><span class="dot green"></span>Ethereum</strong>
-                <span>0x + 40 hex chars</span>
-              </li>
-              <li class="network-item">
-                <strong><span class="dot blue"></span>Solana</strong>
-                <span>Base58 format</span>
-              </li>
-              <li class="network-item">
-                <strong><span class="dot orange"></span>Bitcoin</strong>
-                <span>P2PKH / P2SH / Bech32</span>
-              </li>
+            <h2>Wallet setup</h2>
+            <ul class="info-list">
+              <li class="info-item"><strong><span class="dot green"></span>ETH</strong> <span>Ethereum mainnet</span></li>
+              <li class="info-item"><strong><span class="dot blue"></span>Trust Wallet</strong> <span>Browser or mobile app</span></li>
+              <li class="info-item"><strong><span class="dot orange"></span>Transactions</strong> <span>Signed by wallet</span></li>
             </ul>
-          </div>
-
-          <div style="width:100%">
-            <h2>Recent addresses</h2>
-            <div id="recent-empty" class="empty">No addresses stored yet.</div>
-            <ul class="recent-list" id="recent-list"></ul>
           </div>
         </aside>
       </div>
     </div>
 
     <script>
-      const walletForm = document.getElementById('wallet-form');
+      const connectWalletBtn = document.getElementById('connect-wallet');
+      const walletAddressEl = document.getElementById('wallet-address');
+      const balanceValueEl = document.getElementById('balance-value');
+      const networkValueEl = document.getElementById('network-value');
+      const accountShortEl = document.getElementById('account-short');
       const transferForm = document.getElementById('transfer-form');
-      const walletInput = document.getElementById('wallet-input');
-      const networkSelect = document.getElementById('network-select');
-      const resultBox = document.getElementById('result-box');
-      const statusBadge = document.getElementById('status-badge');
-      const displayAddress = document.getElementById('display-address');
-      const metaNetwork = document.getElementById('meta-network');
-      const metaType = document.getElementById('meta-type');
-      const metaLength = document.getElementById('meta-length');
-      const qrImage = document.getElementById('qr-image');
-      const recentList = document.getElementById('recent-list');
-      const recentEmpty = document.getElementById('recent-empty');
-      const displayBalance = document.getElementById('display-balance');
-      const lastUpdated = document.getElementById('last-updated');
       const transferMessage = document.getElementById('transfer-message');
+      const qrImage = document.getElementById('qr-image');
 
-      const recentStorageKey = 'wallet-viewer-recent';
-      let demoBalance = 2.48;
+      let provider = null;
+      let signer = null;
+      let connectedAddress = '';
 
-      function updateBalanceUI() {
-        displayBalance.textContent = `${demoBalance.toFixed(2)} ETH`;
-        lastUpdated.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      function shortAddress(address) {
+        if (!address) return 'Not linked';
+        return `${address.slice(0, 6)}...${address.slice(-4)}`;
       }
 
-      function getRecentAddresses() {
+      function setMessage(type, text) {
+        transferMessage.className = `message ${type}`;
+        transferMessage.textContent = text;
+      }
+
+      function setQr(address) {
+        if (!address) return;
+        const encoded = encodeURIComponent(address.trim());
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encoded}`;
+      }
+
+      async function refreshWalletState() {
+        if (!window.ethereum || !connectedAddress) return;
+
         try {
-          const value = JSON.parse(localStorage.getItem(recentStorageKey) || '[]');
-          return Array.isArray(value) ? value : [];
-        } catch {
-          return [];
+          provider = new ethers.BrowserProvider(window.ethereum);
+          signer = await provider.getSigner();
+          const address = await signer.getAddress();
+          const network = await provider.getNetwork();
+          const balance = await provider.getBalance(address);
+
+          connectedAddress = address;
+          walletAddressEl.textContent = address;
+          accountShortEl.textContent = shortAddress(address);
+          networkValueEl.textContent = network.name || `Chain ${network.chainId.toString()}`;
+          balanceValueEl.textContent = `${ethers.formatEther(balance)} ETH`;
+          setQr(address);
+        } catch (error) {
+          console.error('Wallet refresh failed:', error);
         }
       }
 
-      function saveRecentAddresses(items) {
-        localStorage.setItem(recentStorageKey, JSON.stringify(items.slice(0, 5)));
-      }
-
-      function formatShortAddress(address) {
-        return address.length > 14 ? `${address.slice(0, 6)}...${address.slice(-4)}` : address;
-      }
-
-      function detectWalletType(value) {
-        const trimmed = value.trim();
-
-        if (/^0x[a-fA-F0-9]{40}$/.test(trimmed)) return { network: 'Ethereum', type: 'EVM address' };
-        if (/^(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,87}|tb1[a-z0-9]{39,87})$/.test(trimmed)) return { network: 'Bitcoin', type: 'Bitcoin address' };
-        if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmed) && !/[0OIl]/.test(trimmed)) return { network: 'Solana', type: 'Solana address' };
-
-        return null;
-      }
-
-      function isValidAddress(value, selectedNetwork) {
-        if (!value) return false;
-
-        const trimmed = value.trim();
-        const detected = detectWalletType(trimmed);
-
-        if (!detected) return false;
-
-        if (selectedNetwork !== 'auto' && selectedNetwork !== detected.network.toLowerCase()) {
-          return false;
-        }
-
-        return true;
-      }
-
-      function updateRecentList() {
-        const items = getRecentAddresses();
-        recentList.innerHTML = '';
-
-        if (!items.length) {
-          recentEmpty.hidden = false;
+      async function connectWallet() {
+        if (!window.ethereum) {
+          setMessage('error', 'Trust Wallet is not detected. Open this page in the Trust Wallet app/browser or install the Trust Wallet extension.');
           return;
         }
 
-        recentEmpty.hidden = true;
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          if (!accounts || !accounts.length) {
+            setMessage('error', 'No account was selected in Trust Wallet.');
+            return;
+          }
 
-        items.forEach((item) => {
-          const li = document.createElement('li');
-          li.className = 'recent-item';
-          li.innerHTML = `
-            <span>${formatShortAddress(item)}</span>
-            <button type="button" data-address="${item}">Use</button>
-          `;
-          recentList.appendChild(li);
-        });
+          connectedAddress = accounts[0];
+          walletAddressEl.textContent = connectedAddress;
+          accountShortEl.textContent = shortAddress(connectedAddress);
+          provider = new ethers.BrowserProvider(window.ethereum);
+          signer = await provider.getSigner();
 
-        recentList.querySelectorAll('button').forEach((button) => {
-          button.addEventListener('click', () => {
-            walletInput.value = button.dataset.address;
-            handleSubmit();
-          });
-        });
-      }
-
-      function renderResult(address, isValid, selectedNetwork) {
-        const detected = detectWalletType(address) || {
-          network: selectedNetwork === 'auto' ? 'Unknown' : selectedNetwork,
-          type: 'Unsupported format'
-        };
-
-        resultBox.hidden = false;
-        statusBadge.textContent = isValid ? 'Valid' : 'Invalid';
-        statusBadge.className = `badge ${isValid ? 'valid' : 'invalid'}`;
-        displayAddress.textContent = address;
-        metaNetwork.textContent = isValid ? detected.network : (selectedNetwork === 'auto' ? 'Unknown' : selectedNetwork);
-        metaType.textContent = isValid ? detected.type : 'Not recognized';
-        metaLength.textContent = `${address.trim().length} chars`;
-
-        const qrData = encodeURIComponent(address.trim());
-        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}`;
-      }
-
-      function saveAddress(address) {
-        const items = getRecentAddresses();
-        const next = [address, ...items.filter((item) => item !== address)].slice(0, 5);
-        saveRecentAddresses(next);
-        updateRecentList();
-      }
-
-      function copyText(value) {
-        if (!value) return;
-        navigator.clipboard.writeText(value).catch(() => {
-          const temp = document.createElement('textarea');
-          temp.value = value;
-          document.body.appendChild(temp);
-          temp.select();
-          document.execCommand('copy');
-          temp.remove();
-        });
-      }
-
-      function handleSubmit(event) {
-        if (event) event.preventDefault();
-
-        const rawValue = walletInput.value;
-        const cleaned = rawValue.trim();
-        const selectedNetwork = networkSelect.value;
-
-        if (!cleaned) {
-          renderResult('Enter a wallet address', false, selectedNetwork);
-          return;
-        }
-
-        const isValid = isValidAddress(cleaned, selectedNetwork);
-        renderResult(cleaned, isValid, selectedNetwork);
-
-        if (isValid) {
-          saveAddress(cleaned);
+          const network = await provider.getNetwork();
+          const balance = await provider.getBalance(connectedAddress);
+          networkValueEl.textContent = network.name || `Chain ${network.chainId.toString()}`;
+          balanceValueEl.textContent = `${ethers.formatEther(balance)} ETH`;
+          setQr(connectedAddress);
+          setMessage('success', 'Trust Wallet connected successfully.');
+        } catch (error) {
+          console.error('Connect wallet failed:', error);
+          setMessage('error', 'The wallet connection request was rejected or failed.');
         }
       }
 
-      walletForm.addEventListener('submit', handleSubmit);
+      connectWalletBtn.addEventListener('click', connectWallet);
 
-      document.getElementById('copy-address').addEventListener('click', () => {
-        copyText(walletInput.value.trim());
-      });
-
-      document.getElementById('mini-copy').addEventListener('click', () => {
-        copyText(displayAddress.textContent.trim());
-      });
-
-      document.getElementById('clear-form').addEventListener('click', () => {
-        walletInput.value = '';
-        resultBox.hidden = true;
-      });
-
-      document.getElementById('load-sample').addEventListener('click', () => {
-        walletInput.value = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
-        handleSubmit();
-      });
-
-      transferForm.addEventListener('submit', (event) => {
+      transferForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
+        if (!window.ethereum || !connectedAddress) {
+          setMessage('error', 'Connect Trust Wallet before sending ETH.');
+          return;
+        }
+
         const recipient = document.getElementById('recipient-address').value.trim();
-        const amount = Number(document.getElementById('transfer-amount').value);
-        const note = document.getElementById('transfer-note').value.trim();
+        const amount = document.getElementById('transfer-amount').value.trim();
+        const memo = document.getElementById('transfer-note').value.trim();
 
-        if (!recipient || !amount || amount <= 0) {
-          transferMessage.className = 'message error';
-          transferMessage.textContent = 'Enter a valid recipient address and amount to continue.';
+        if (!recipient || !amount) {
+          setMessage('error', 'Recipient address and amount are required.');
           return;
         }
 
-        if (!isValidAddress(recipient, 'auto')) {
-          transferMessage.className = 'message error';
-          transferMessage.textContent = 'Recipient address is not a valid wallet address format.';
+        if (!ethers.isAddress(recipient)) {
+          setMessage('error', 'Recipient wallet address is invalid.');
           return;
         }
 
-        if (amount > demoBalance) {
-          transferMessage.className = 'message error';
-          transferMessage.textContent = 'Transfer amount exceeds the available demo balance.';
-          return;
+        try {
+          const valueWei = ethers.parseEther(amount);
+          const tx = {
+            from: connectedAddress,
+            to: recipient,
+            value: valueWei,
+            data: memo ? ethers.hexlify(ethers.toUtf8Bytes(memo)) : '0x'
+          };
+
+          const signer = await provider.getSigner();
+          const txResponse = await signer.sendTransaction(tx);
+
+          setMessage('success', `Transaction sent successfully. Hash: ${txResponse.hash}`);
+          transferForm.reset();
+          await refreshWalletState();
+        } catch (error) {
+          console.error('Send transaction failed:', error);
+          setMessage('error', 'Transaction failed. Check your wallet balance or network connection.');
         }
-
-        demoBalance = Number((demoBalance - amount).toFixed(2));
-        updateBalanceUI();
-
-        transferMessage.className = 'message success';
-        transferMessage.textContent = `Demo transfer of ${amount.toFixed(2)} ETH to ${formatShortAddress(recipient)} was scheduled successfully${note ? ' with memo: ' + note : ''}.`;
-
-        transferForm.reset();
       });
 
-      updateBalanceUI();
-      updateRecentList();
+      window.addEventListener('load', async () => {
+        if (window.ethereum) {
+          setMessage('info', 'Trust Wallet detected. Press Connect Trust Wallet to continue.');
+        } else {
+          setMessage('error', 'Trust Wallet was not found. Open in Trust Wallet mobile or install the browser extension.');
+        }
+      });
     </script>
   </body>
 </html>
