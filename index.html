@@ -34,7 +34,7 @@
       }
 
       .app {
-        width: min(980px, 100%);
+        width: min(1100px, 100%);
         background: rgba(15, 23, 42, 0.72);
         border: 1px solid var(--border);
         border-radius: 28px;
@@ -88,7 +88,7 @@
 
       .content {
         display: grid;
-        grid-template-columns: 1.3fr 0.7fr;
+        grid-template-columns: 1.25fr 1fr;
         gap: 22px;
         padding: 22px 28px 28px;
       }
@@ -105,6 +105,30 @@
         font-size: 1.05rem;
       }
 
+      .balance-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .balance-box {
+        background: rgba(2, 6, 23, 0.56);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      .balance-box small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .balance-box strong {
+        font-size: 1.25rem;
+      }
+
       form {
         display: grid;
         gap: 16px;
@@ -118,21 +142,29 @@
 
       select,
       input,
-      button {
+      button,
+      textarea {
         border-radius: 14px;
         border: 1px solid var(--border);
         font: inherit;
       }
 
       select,
-      input {
+      input,
+      textarea {
         width: 100%;
         background: rgba(15, 23, 42, 0.8);
         color: var(--text);
         padding: 14px 16px;
       }
 
-      input::placeholder {
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
         color: var(--muted);
       }
 
@@ -270,6 +302,45 @@
         font-size: 1rem;
       }
 
+      .transfer-box {
+        background: rgba(2, 6, 23, 0.56);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        margin-top: 18px;
+      }
+
+      .transfer-box h3 {
+        margin: 0 0 14px;
+      }
+
+      .transfer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .message {
+        display: none;
+        padding: 12px 14px;
+        border-radius: 12px;
+        margin-top: 14px;
+      }
+
+      .message.success {
+        display: block;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        color: #bbf7d0;
+      }
+
+      .message.error {
+        display: block;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fecaca;
+      }
+
       .qr-panel {
         display: grid;
         place-items: center;
@@ -360,12 +431,15 @@
         cursor: pointer;
       }
 
-      @media (max-width: 780px) {
+      @media (max-width: 860px) {
         .content {
           grid-template-columns: 1fr;
         }
 
-        .field-row {
+        .balance-row,
+        .field-row,
+        .transfer-grid,
+        .meta {
           grid-template-columns: 1fr;
         }
 
@@ -388,6 +462,21 @@
 
       <div class="content">
         <main class="panel">
+          <div class="balance-row">
+            <div class="balance-box">
+              <small>Available balance</small>
+              <strong id="display-balance">0.00 ETH</strong>
+            </div>
+            <div class="balance-box">
+              <small>Network</small>
+              <strong>Ethereum</strong>
+            </div>
+            <div class="balance-box">
+              <small>Last updated</small>
+              <strong id="last-updated">Now</strong>
+            </div>
+          </div>
+
           <h2>Check or inspect a wallet address</h2>
 
           <form id="wallet-form">
@@ -444,6 +533,21 @@
               </div>
             </div>
           </div>
+
+          <div class="transfer-box">
+            <h3>Quick transfer</h3>
+            <form id="transfer-form">
+              <div class="transfer-grid">
+                <input id="recipient-address" type="text" placeholder="Recipient wallet address" />
+                <input id="transfer-amount" type="number" min="0.01" step="0.01" placeholder="Amount" />
+              </div>
+              <textarea id="transfer-note" placeholder="Memo (optional)"></textarea>
+              <div class="actions">
+                <button class="primary" type="submit">Send demo transfer</button>
+              </div>
+              <div id="transfer-message" class="message"></div>
+            </form>
+          </div>
         </main>
 
         <aside class="panel qr-panel">
@@ -480,6 +584,7 @@
 
     <script>
       const walletForm = document.getElementById('wallet-form');
+      const transferForm = document.getElementById('transfer-form');
       const walletInput = document.getElementById('wallet-input');
       const networkSelect = document.getElementById('network-select');
       const resultBox = document.getElementById('result-box');
@@ -491,8 +596,17 @@
       const qrImage = document.getElementById('qr-image');
       const recentList = document.getElementById('recent-list');
       const recentEmpty = document.getElementById('recent-empty');
+      const displayBalance = document.getElementById('display-balance');
+      const lastUpdated = document.getElementById('last-updated');
+      const transferMessage = document.getElementById('transfer-message');
 
       const recentStorageKey = 'wallet-viewer-recent';
+      let demoBalance = 2.48;
+
+      function updateBalanceUI() {
+        displayBalance.textContent = `${demoBalance.toFixed(2)} ETH`;
+        lastUpdated.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
 
       function getRecentAddresses() {
         try {
@@ -642,6 +756,41 @@
         handleSubmit();
       });
 
+      transferForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const recipient = document.getElementById('recipient-address').value.trim();
+        const amount = Number(document.getElementById('transfer-amount').value);
+        const note = document.getElementById('transfer-note').value.trim();
+
+        if (!recipient || !amount || amount <= 0) {
+          transferMessage.className = 'message error';
+          transferMessage.textContent = 'Enter a valid recipient address and amount to continue.';
+          return;
+        }
+
+        if (!isValidAddress(recipient, 'auto')) {
+          transferMessage.className = 'message error';
+          transferMessage.textContent = 'Recipient address is not a valid wallet address format.';
+          return;
+        }
+
+        if (amount > demoBalance) {
+          transferMessage.className = 'message error';
+          transferMessage.textContent = 'Transfer amount exceeds the available demo balance.';
+          return;
+        }
+
+        demoBalance = Number((demoBalance - amount).toFixed(2));
+        updateBalanceUI();
+
+        transferMessage.className = 'message success';
+        transferMessage.textContent = `Demo transfer of ${amount.toFixed(2)} ETH to ${formatShortAddress(recipient)} was scheduled successfully${note ? ' with memo: ' + note : ''}.`;
+
+        transferForm.reset();
+      });
+
+      updateBalanceUI();
       updateRecentList();
     </script>
   </body>
