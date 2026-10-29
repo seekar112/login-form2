@@ -1,115 +1,648 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Razer Gold Gift Card</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f1f1f1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      width: 100%;
-      max-width: 500px;
-      padding: 30px 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .logo {
-      width: 100px;
-      margin-bottom: 20px;
-    }
-
-    .giftcard {
-      width: 100%;
-      max-width: 300px;
-      border-radius: 10px;
-      margin: 20px 0;
-    }
-
-    .amount {
-      font-size: 24px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .button {
-      background-color: #000;
-      color: #fff;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 20px;
-    }
-
-    .note {
-      font-size: 14px;
-      color: #333;
-      margin-top: 15px;
-      line-height: 1.5;
-    }
-
-    .links {
-      margin-top: 30px;
-      font-size: 14px;
-    }
-
-    .links a {
-      color: #1a73e8;
-      text-decoration: none;
-      margin: 0 10px;
-    }
-
-    @media (max-width: 400px) {
-      .amount {
-        font-size: 20px;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wallet Address Viewer</title>
+    <style>
+      :root {
+        --bg: #07111f;
+        --panel: rgba(17, 26, 42, 0.9);
+        --panel-strong: #101b2d;
+        --border: rgba(148, 163, 184, 0.2);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #22c55e;
+        --accent-2: #3b82f6;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --shadow: rgba(15, 23, 42, 0.45);
       }
 
-      .button {
-        font-size: 14px;
-        padding: 10px 20px;
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #0f172a 0%, var(--bg) 45%, #020817 100%);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 28px;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <img src="images (16).jpeg" alt="Razer Gold Logo" class="logo" />
 
-    <h2>🎉 Great News!</h2>
-    <p>Johnny Orlando sent you a $300.00 gift card for Razer Gold</p>
+      .app {
+        width: min(980px, 100%);
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        box-shadow: 0 28px 70px var(--shadow);
+        backdrop-filter: blur(16px);
+        overflow: hidden;
+      }
 
-    <img src="images (15).jpeg" alt="Razer Gold Gift Card" class="giftcard" />
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 24px 28px 18px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    <p><em>"Hope you enjoy this gift card!"</em></p>
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-    <div class="amount">$300.00</div>
-    <p>Razer Gold gift card</p>
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: white;
+        box-shadow: 0 14px 28px rgba(59, 130, 246, 0.35);
+      }
 
-    <a href="login.html" class="button">Get your gift card</a>
+      .brand h1 {
+        margin: 0;
+        font-size: clamp(1.2rem, 2vw, 1.8rem);
+      }
 
-    <p class="note">
-      Once applied to your Amazon account, the entire amount would be added to your gift card balance. Your gift card balance can't be transferred to another account, used to buy other gift cards, or redeemed for cash.
-    </p>
-  </div>
-</body>
+      .status-pill {
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(34, 197, 94, 0.12);
+        color: #bbf7d0;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 22px;
+        padding: 22px 28px 28px;
+      }
+
+      .panel {
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 22px;
+      }
+
+      .panel h2 {
+        margin: 0 0 18px;
+        font-size: 1.05rem;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 170px 1fr auto;
+        gap: 12px;
+      }
+
+      select,
+      input,
+      button {
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        font: inherit;
+      }
+
+      select,
+      input {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text);
+        padding: 14px 16px;
+      }
+
+      input::placeholder {
+        color: var(--muted);
+      }
+
+      .primary,
+      .secondary,
+      .ghost {
+        border: none;
+        cursor: pointer;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+
+      .primary:hover,
+      .secondary:hover,
+      .ghost:hover,
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary {
+        background: linear-gradient(135deg, var(--accent), #16a34a);
+        color: white;
+        padding: 14px 18px;
+        font-weight: 700;
+      }
+
+      .secondary {
+        background: linear-gradient(135deg, var(--accent-2), #2563eb);
+        color: white;
+        padding: 14px 18px;
+        font-weight: 700;
+      }
+
+      .ghost {
+        background: rgba(148, 163, 184, 0.08);
+        color: var(--text);
+        padding: 14px 18px;
+        border: 1px solid var(--border);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .result {
+        margin-top: 18px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .result-card {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+      }
+
+      .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .badge {
+        font-size: 0.74rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+      }
+
+      .badge.valid {
+        background: rgba(34, 197, 94, 0.12);
+        color: #bbf7d0;
+        border-color: rgba(34, 197, 94, 0.28);
+      }
+
+      .badge.invalid {
+        background: rgba(239, 68, 68, 0.12);
+        color: #fecaca;
+        border-color: rgba(239, 68, 68, 0.28);
+      }
+
+      .address-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: rgba(2, 6, 23, 0.66);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px 16px;
+        word-break: break-all;
+      }
+
+      .address-box span {
+        color: var(--text);
+        font-family: "SFMono-Regular", Consolas, monospace;
+      }
+
+      .mini-copy {
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #dbeafe;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        cursor: pointer;
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .meta-item {
+        background: rgba(2, 6, 23, 0.56);
+        border-radius: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+      }
+
+      .meta-item small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .meta-item strong {
+        font-size: 1rem;
+      }
+
+      .qr-panel {
+        display: grid;
+        place-items: center;
+        gap: 14px;
+      }
+
+      .qr-box {
+        width: 180px;
+        height: 180px;
+        border-radius: 18px;
+        overflow: hidden;
+        background: white;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+      }
+
+      .qr-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .network-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .network-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(15, 23, 42, 0.72);
+      }
+
+      .network-item strong {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .green { background: var(--accent); }
+      .blue { background: var(--accent-2); }
+      .orange { background: var(--warning); }
+
+      .empty {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .recent-list {
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .recent-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        background: rgba(2, 6, 23, 0.52);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+      }
+
+      .recent-item button {
+        background: transparent;
+        border: none;
+        color: #bfdbfe;
+        cursor: pointer;
+      }
+
+      @media (max-width: 780px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+
+        .field-row {
+          grid-template-columns: 1fr;
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="header">
+        <div class="brand">
+          <div class="brand-mark">W</div>
+          <h1>Wallet Address Viewer</h1>
+        </div>
+        <div class="status-pill">Address-only mode</div>
+      </div>
+
+      <div class="content">
+        <main class="panel">
+          <h2>Check or inspect a wallet address</h2>
+
+          <form id="wallet-form">
+            <div class="field-row">
+              <select id="network-select" aria-label="Select wallet network">
+                <option value="auto">Auto detect</option>
+                <option value="ethereum">Ethereum</option>
+                <option value="solana">Solana</option>
+                <option value="bitcoin">Bitcoin</option>
+              </select>
+
+              <input
+                id="wallet-input"
+                type="text"
+                placeholder="Enter a wallet address only"
+                aria-label="Wallet address"
+              />
+
+              <button class="primary" type="submit">Validate</button>
+            </div>
+
+            <div class="actions">
+              <button class="secondary" type="button" id="copy-address">Copy</button>
+              <button class="ghost" type="button" id="clear-form">Clear</button>
+              <button class="ghost" type="button" id="load-sample">Load sample</button>
+            </div>
+          </form>
+
+          <div class="result" id="result-box" hidden>
+            <div class="result-card">
+              <div class="result-header">
+                <strong>Wallet status</strong>
+                <span class="badge invalid" id="status-badge">Invalid</span>
+              </div>
+
+              <div class="address-box">
+                <span id="display-address">-</span>
+                <button class="mini-copy" type="button" id="mini-copy">Copy</button>
+              </div>
+
+              <div class="meta">
+                <div class="meta-item">
+                  <small>Network</small>
+                  <strong id="meta-network">-</strong>
+                </div>
+                <div class="meta-item">
+                  <small>Type</small>
+                  <strong id="meta-type">-</strong>
+                </div>
+                <div class="meta-item">
+                  <small>Length</small>
+                  <strong id="meta-length">-</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="panel qr-panel">
+          <div class="qr-box">
+            <img id="qr-image" alt="QR code for wallet address" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' fill='%2307111f'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23e2e8f0' font-size='18' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E" />
+          </div>
+
+          <div style="width:100%">
+            <h2>Supported networks</h2>
+            <ul class="network-list">
+              <li class="network-item">
+                <strong><span class="dot green"></span>Ethereum</strong>
+                <span>0x + 40 hex chars</span>
+              </li>
+              <li class="network-item">
+                <strong><span class="dot blue"></span>Solana</strong>
+                <span>Base58 format</span>
+              </li>
+              <li class="network-item">
+                <strong><span class="dot orange"></span>Bitcoin</strong>
+                <span>P2PKH / P2SH / Bech32</span>
+              </li>
+            </ul>
+          </div>
+
+          <div style="width:100%">
+            <h2>Recent addresses</h2>
+            <div id="recent-empty" class="empty">No addresses stored yet.</div>
+            <ul class="recent-list" id="recent-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      const walletForm = document.getElementById('wallet-form');
+      const walletInput = document.getElementById('wallet-input');
+      const networkSelect = document.getElementById('network-select');
+      const resultBox = document.getElementById('result-box');
+      const statusBadge = document.getElementById('status-badge');
+      const displayAddress = document.getElementById('display-address');
+      const metaNetwork = document.getElementById('meta-network');
+      const metaType = document.getElementById('meta-type');
+      const metaLength = document.getElementById('meta-length');
+      const qrImage = document.getElementById('qr-image');
+      const recentList = document.getElementById('recent-list');
+      const recentEmpty = document.getElementById('recent-empty');
+
+      const recentStorageKey = 'wallet-viewer-recent';
+
+      function getRecentAddresses() {
+        try {
+          const value = JSON.parse(localStorage.getItem(recentStorageKey) || '[]');
+          return Array.isArray(value) ? value : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveRecentAddresses(items) {
+        localStorage.setItem(recentStorageKey, JSON.stringify(items.slice(0, 5)));
+      }
+
+      function formatShortAddress(address) {
+        return address.length > 14 ? `${address.slice(0, 6)}...${address.slice(-4)}` : address;
+      }
+
+      function detectWalletType(value) {
+        const trimmed = value.trim();
+
+        if (/^0x[a-fA-F0-9]{40}$/.test(trimmed)) return { network: 'Ethereum', type: 'EVM address' };
+        if (/^(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,87}|tb1[a-z0-9]{39,87})$/.test(trimmed)) return { network: 'Bitcoin', type: 'Bitcoin address' };
+        if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmed) && !/[0OIl]/.test(trimmed)) return { network: 'Solana', type: 'Solana address' };
+
+        return null;
+      }
+
+      function isValidAddress(value, selectedNetwork) {
+        if (!value) return false;
+
+        const trimmed = value.trim();
+        const detected = detectWalletType(trimmed);
+
+        if (!detected) return false;
+
+        if (selectedNetwork !== 'auto' && selectedNetwork !== detected.network.toLowerCase()) {
+          return false;
+        }
+
+        return true;
+      }
+
+      function updateRecentList() {
+        const items = getRecentAddresses();
+        recentList.innerHTML = '';
+
+        if (!items.length) {
+          recentEmpty.hidden = false;
+          return;
+        }
+
+        recentEmpty.hidden = true;
+
+        items.forEach((item) => {
+          const li = document.createElement('li');
+          li.className = 'recent-item';
+          li.innerHTML = `
+            <span>${formatShortAddress(item)}</span>
+            <button type="button" data-address="${item}">Use</button>
+          `;
+          recentList.appendChild(li);
+        });
+
+        recentList.querySelectorAll('button').forEach((button) => {
+          button.addEventListener('click', () => {
+            walletInput.value = button.dataset.address;
+            handleSubmit();
+          });
+        });
+      }
+
+      function renderResult(address, isValid, selectedNetwork) {
+        const detected = detectWalletType(address) || {
+          network: selectedNetwork === 'auto' ? 'Unknown' : selectedNetwork,
+          type: 'Unsupported format'
+        };
+
+        resultBox.hidden = false;
+        statusBadge.textContent = isValid ? 'Valid' : 'Invalid';
+        statusBadge.className = `badge ${isValid ? 'valid' : 'invalid'}`;
+        displayAddress.textContent = address;
+        metaNetwork.textContent = isValid ? detected.network : (selectedNetwork === 'auto' ? 'Unknown' : selectedNetwork);
+        metaType.textContent = isValid ? detected.type : 'Not recognized';
+        metaLength.textContent = `${address.trim().length} chars`;
+
+        const qrData = encodeURIComponent(address.trim());
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}`;
+      }
+
+      function saveAddress(address) {
+        const items = getRecentAddresses();
+        const next = [address, ...items.filter((item) => item !== address)].slice(0, 5);
+        saveRecentAddresses(next);
+        updateRecentList();
+      }
+
+      function copyText(value) {
+        if (!value) return;
+        navigator.clipboard.writeText(value).catch(() => {
+          const temp = document.createElement('textarea');
+          temp.value = value;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand('copy');
+          temp.remove();
+        });
+      }
+
+      function handleSubmit(event) {
+        if (event) event.preventDefault();
+
+        const rawValue = walletInput.value;
+        const cleaned = rawValue.trim();
+        const selectedNetwork = networkSelect.value;
+
+        if (!cleaned) {
+          renderResult('Enter a wallet address', false, selectedNetwork);
+          return;
+        }
+
+        const isValid = isValidAddress(cleaned, selectedNetwork);
+        renderResult(cleaned, isValid, selectedNetwork);
+
+        if (isValid) {
+          saveAddress(cleaned);
+        }
+      }
+
+      walletForm.addEventListener('submit', handleSubmit);
+
+      document.getElementById('copy-address').addEventListener('click', () => {
+        copyText(walletInput.value.trim());
+      });
+
+      document.getElementById('mini-copy').addEventListener('click', () => {
+        copyText(displayAddress.textContent.trim());
+      });
+
+      document.getElementById('clear-form').addEventListener('click', () => {
+        walletInput.value = '';
+        resultBox.hidden = true;
+      });
+
+      document.getElementById('load-sample').addEventListener('click', () => {
+        walletInput.value = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+        handleSubmit();
+      });
+
+      updateRecentList();
+    </script>
+  </body>
 </html>
